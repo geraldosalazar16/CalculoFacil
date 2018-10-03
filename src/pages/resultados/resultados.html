@@ -1,0 +1,28 @@
+
+<ion-header>
+
+  <ion-navbar>
+    <ion-title text-center>Resultados</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <ion-item>
+    <ion-textarea rows="15" [(ngModel)]="explic">
+    </ion-textarea>
+  </ion-item>
+  <ion-card >
+      <ion-card-header>
+          <ion-label>Mostrar procedimiento</ion-label>
+          <ion-toggle [(ngModel)]="mostrar_procedimiento"></ion-toggle>
+      </ion-card-header>
+      <hr>
+      <ion-card-content>
+        <div *ngIf="mostrar_procedimiento == true">
+            <p *ngFor="let texto of textos">{{texto}}<p>
+        </div>
+      </ion-card-content>
+  </ion-card>
+</ion-content>

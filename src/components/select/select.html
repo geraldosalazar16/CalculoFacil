@@ -1,0 +1,20 @@
+<div *ngIf="habilitado">
+<ion-item>
+    <ion-label color="label-color" floating>{{label}} <span *ngIf="requerido">*</span></ion-label>
+    <ion-select interface="popover"
+    [id]="id"
+    [(ngModel)]="valor" (ionChange)="cambio()">
+      <ion-option *ngFor="let item of valores" 
+        value="{{item.id}}"
+        [selected]="item.id == [valor]"
+        [disabled]="bloqueado"
+        >
+          {{item.valor}}
+      </ion-option>
+  </ion-select>
+</ion-item>
+<p ion-text color="danger" *ngIf="error">{{error}}</p>
+</div>
+
+ 
+

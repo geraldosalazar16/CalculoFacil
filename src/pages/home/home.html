@@ -1,0 +1,453 @@
+<ion-header>
+  <ion-navbar>
+    <ion-row>
+      <ion-col col-md-3>
+        <ion-item>
+            <ion-label color="primary" floating>Cálculos </ion-label>
+            <ion-select interface="action-sheet"
+            [(ngModel)]="calculos" (ionChange)="cambio_estructura()">
+              <ion-option 
+              *ngFor="let est of estructuras" 
+              [value] = "est"
+              [selected]="est.inicial">
+                  {{est.estructura}}
+              </ion-option>
+          </ion-select>
+        </ion-item>
+      </ion-col> 
+      <ion-title text-center>{{form.titulo}}</ion-title>
+      <ion-buttons end>
+          <boton *ngFor="let boton of botones_recibidos"
+          (click)="click_boton(boton)"
+          [nombre] = "boton.nombre"
+          [descripcion] = "boton.descripcion"
+          [id] = "boton.id"
+          [color]  = "boton.color" 
+          [url] = "boton.url"
+          [habilitado] = "boton.habilitado"
+          [accion] = "boton.accion">
+          </boton>
+      </ion-buttons>
+    </ion-row>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>  
+  <ion-row justify-content-center>
+    <ion-col col-12 col-sm-12 col-md-6>
+    <ion-slides 
+    pager="true" 
+    class="swiper-no-swiping"
+    >
+      <ion-slide *ngFor="let card of cards_recibidos">        
+        <ion-card >
+          <ion-card-header>
+            <h1>{{card.titulo}}</h1>
+          </ion-card-header>
+          <hr>
+          <ion-card-content>
+              <div *ngFor="let componente of card.componentes">
+                <div *ngIf="componente.tipo == 'toggle-componentes'&&componente.habilitado == true">
+                  <ion-card>
+                    <ion-card-header>                      
+                        <my-toggle (evento)="onToggle(componente,$event)"
+                          [label] = "componente.label"
+                          [descripcion] = "componente.descripcion"
+                          [id] = "componente.id"
+                          [valor] = "componente.default"
+                          [habilitado] = "componente.habilitado"
+                          [requerido] = "componente.requerido"
+                        >                      
+                        </my-toggle>
+                    </ion-card-header>
+                    <ion-card-content>
+                        <div *ngFor="let componente of componente.componentes">
+                            <div *ngIf="componente.tipo == 'toggle-componentes'&&componente.habilitado == true">
+                                <ion-card>
+                                  <ion-card-header>                      
+                                      <my-toggle (evento)="onToggle(componente,$event)"
+                                        [label] = "componente.label"
+                                        [descripcion] = "componente.descripcion"
+                                        [id] = "componente.id"
+                                        [valor] = "componente.default"
+                                        [habilitado] = "componente.habilitado"
+                                        [requerido] = "componente.requerido"
+                                      >                      
+                                      </my-toggle>
+                                  </ion-card-header>
+                                  <ion-card-content>
+                                      <div *ngFor="let componente of componente.componentes">
+                                          <div *ngIf="componente.tipo == 'select-componentes'&&componente.habilitado == true">
+                                              <ion-card>
+                                                  <ion-card-header>                      
+                                                    <my-select (cambio_select)="onChangeSelect(componente,$event)"
+                                                      [label] = "componente.label"
+                                                      [descripcion] = "componente.descripcion"
+                                                      [id] = "componente.id"
+                                                      [valores]  = "componente.valores" 
+                                                      [valor] = "componente.default"
+                                                      [habilitado] = "componente.habilitado"
+                                                      [requerido]="componente.requerido">                      
+                                                    </my-select>
+                                                  </ion-card-header>
+                                                  <ion-card-content>
+                                                      <div *ngFor="let componente of componente.componentes">
+                                                          <div *ngIf="componente.tipo == 'select'&&componente.habilitado == true">
+                                                            <my-select 
+                                                              [label] = "componente.label"
+                                                              [descripcion] = "componente.descripcion"
+                                                              [id] = "componente.id"
+                                                              [valores]  = "componente.valores" 
+                                                              [valor] = "componente.default"
+                                                              [habilitado] = "componente.habilitado"
+                                                              [requerido]="componente.requerido"
+                                                              >                      
+                                                            </my-select>
+                                                            <hr>
+                                                          </div>
+                                                          <div *ngIf="componente.tipo == 'fecha'&&componente.habilitado == true">
+                                                            <my-datetime
+                                                              [label] = "componente.label"
+                                                              [descripcion] = "componente.descripcion"
+                                                              [id] = "componente.id"
+                                                              [default] = "componente.default"
+                                                              [habilitado] = "componente.habilitado"
+                                                              [requerido]="componente.requerido">                       
+                                                            </my-datetime>
+                                                            <hr>
+                                                          </div>
+                                                          <div *ngIf="componente.tipo == 'input'&&componente.habilitado == true">
+                                                            <my-input
+                                                              [label] = "componente.label"
+                                                              [descripcion] = "componente.descripcion"
+                                                              [id] = "componente.id" 
+                                                              [valor] = "componente.default"
+                                                              [habilitado] = "componente.habilitado"
+                                                              [requerido]="componente.requerido"
+                                                              [placeholder]="componente.placeholder"
+                                                              [bloqueado] = "componente.bloqueado"
+                                                              [mascara] = "componente.mascara">                      
+                                                            </my-input>
+                                                            <hr>
+                                                          </div>
+                                                          <div *ngIf="componente.tipo == 'parrafo'&&componente.habilitado == true">
+                                                            <my-p
+                                                              [label] = "componente.label"
+                                                              [descripcion] = "componente.descripcion"
+                                                              [id] = "componente.id"
+                                                              [valores]  = "componente.valores" 
+                                                              [default] = "componente.default"
+                                                              [habilitado] = "componente.habilitado">                      
+                                                            </my-p>
+                                                            <hr>
+                                                          </div>
+                                                          <div *ngIf="componente.tipo == 'toggle'&&componente.habilitado == true">
+                                                            <my-toggle
+                                                              [label] = "componente.label"
+                                                              [descripcion] = "componente.descripcion"
+                                                              [id] = "componente.id"
+                                                              [valor] = "componente.default"
+                                                              [habilitado] = "componente.habilitado"
+                                                              [requerido] = "componente.requerido"
+                                                              >                      
+                                                            </my-toggle>
+                                                            <hr>
+                                                          </div>
+                                                      </div>
+                                                  </ion-card-content>                  
+                                                </ion-card>
+                                          </div>
+                                          <div *ngIf="componente.tipo == 'select'&&componente.habilitado == true">
+                                            <my-select
+                                              [label] = "componente.label"
+                                              [descripcion] = "componente.descripcion"
+                                              [id] = "componente.id"
+                                              [valores]  = "componente.valores" 
+                                              [valor] = "componente.default"
+                                              [habilitado] = "componente.habilitado"
+                                              [requerido]="componente.requerido">                      
+                                            </my-select>
+                                            <hr>
+                                          </div>
+                                          <div *ngIf="componente.tipo == 'fecha'&&componente.habilitado == true">
+                                            <my-datetime
+                                              [label] = "componente.label"
+                                              [descripcion] = "componente.descripcion"
+                                              [id] = "componente.id"
+                                              [default] = "componente.default"
+                                              [habilitado] = "componente.habilitado"
+                                              [requerido]="componente.requerido">                       
+                                            </my-datetime>
+                                            <hr>
+                                          </div>
+                                          <div *ngIf="componente.tipo == 'input'&&componente.habilitado == true">
+                                            <my-input
+                                              [label] = "componente.label"
+                                              [descripcion] = "componente.descripcion"
+                                              [id] = "componente.id" 
+                                              [valor] = "componente.default"
+                                              [habilitado] = "componente.habilitado"
+                                              [requerido]="componente.requerido"
+                                              [placeholder]="componente.placeholder"
+                                              [bloqueado] = "componente.bloqueado"
+                                              [mascara] = "componente.mascara">                      
+                                            </my-input>
+                                            <hr>
+                                          </div>
+                                          <div *ngIf="componente.tipo == 'parrafo'&&componente.habilitado == true">
+                                            <my-p
+                                              [label] = "componente.label"
+                                              [descripcion] = "componente.descripcion"
+                                              [id] = "componente.id"
+                                              [valores]  = "componente.valores" 
+                                              [default] = "componente.default"
+                                              [habilitado] = "componente.habilitado">                      
+                                            </my-p>
+                                            <hr>
+                                          </div>
+                                          <div *ngIf="componente.tipo == 'toggle'&&componente.habilitado == true">
+                                            <my-toggle
+                                              [label] = "componente.label"
+                                              [descripcion] = "componente.descripcion"
+                                              [id] = "componente.id"
+                                              [valor] = "componente.default"
+                                              [habilitado] = "componente.habilitado"
+                                              [requerido] = "componente.requerido"
+                                              >                      
+                                            </my-toggle>
+                                            <hr>
+                                          </div>
+                                      </div>
+                                  </ion-card-content>                  
+                                </ion-card>
+                            </div>
+                            <div *ngIf="componente.tipo == 'select'&&componente.habilitado == true">
+                              <my-select
+                                [label] = "componente.label"
+                                [descripcion] = "componente.descripcion"
+                                [id] = "componente.id"
+                                [valores]  = "componente.valores" 
+                                [valor] = "componente.default"
+                                [habilitado] = "componente.habilitado"
+                                [requerido]="componente.requerido">                      
+                              </my-select>
+                              <hr>
+                            </div>
+                            <div *ngIf="componente.tipo == 'fecha'&&componente.habilitado == true">
+                              <my-datetime
+                                [label] = "componente.label"
+                                [descripcion] = "componente.descripcion"
+                                [id] = "componente.id"
+                                [default] = "componente.default"
+                                [habilitado] = "componente.habilitado"
+                                [requerido]="componente.requerido">                       
+                              </my-datetime>
+                              <hr>
+                            </div>
+                            <div *ngIf="componente.tipo == 'input'&&componente.habilitado == true">
+                              <my-input
+                                [label] = "componente.label"
+                                [descripcion] = "componente.descripcion"
+                                [id] = "componente.id" 
+                                [valor] = "componente.default"
+                                [habilitado] = "componente.habilitado"
+                                [requerido]="componente.requerido"
+                                [placeholder]="componente.placeholder"
+                                [bloqueado] = "componente.bloqueado"
+                                [mascara] = "componente.mascara">                      
+                              </my-input>
+                              <hr>
+                            </div>
+                            <div *ngIf="componente.tipo == 'parrafo'&&componente.habilitado == true">
+                              <my-p
+                                [label] = "componente.label"
+                                [descripcion] = "componente.descripcion"
+                                [id] = "componente.id"
+                                [valores]  = "componente.valores" 
+                                [default] = "componente.default"
+                                [habilitado] = "componente.habilitado">                      
+                              </my-p>
+                              <hr>
+                            </div>
+                            <div *ngIf="componente.tipo == 'toggle'&&componente.habilitado == true">
+                              <my-toggle
+                                [label] = "componente.label"
+                                [descripcion] = "componente.descripcion"
+                                [id] = "componente.id"
+                                [valor] = "componente.default"
+                                [habilitado] = "componente.habilitado"
+                                [requerido] = "componente.requerido"
+                                >                      
+                              </my-toggle>
+                              <hr>
+                            </div>
+                        </div>
+                    </ion-card-content>                  
+                  </ion-card>
+                </div>
+                <div *ngIf="componente.tipo == 'select'&&componente.habilitado == true">
+                  <my-select
+                    [label] = "componente.label"
+                    [descripcion] = "componente.descripcion"
+                    [id] = "componente.id"
+                    [valores]  = "componente.valores" 
+                    [valor] = "componente.default"
+                    [habilitado] = "componente.habilitado"
+                    [requerido]="componente.requerido">                      
+                  </my-select>
+                  <hr>
+                </div>
+                <div *ngIf="componente.tipo == 'fecha'&&componente.habilitado == true">
+                  <my-datetime
+                    [label] = "componente.label"
+                    [descripcion] = "componente.descripcion"
+                    [id] = "componente.id"
+                    [default] = "componente.default"
+                    [habilitado] = "componente.habilitado"
+                    [requerido]="componente.requerido">                       
+                  </my-datetime>
+                  <hr>
+                </div>
+                <div *ngIf="componente.tipo == 'input'&&componente.habilitado == true">
+                  <my-input
+                    [label] = "componente.label"
+                    [descripcion] = "componente.descripcion"
+                    [id] = "componente.id" 
+                    [valor] = "componente.default"
+                    [habilitado] = "componente.habilitado"
+                    [requerido]="componente.requerido"
+                    [placeholder]="componente.placeholder"
+                    [bloqueado] = "componente.bloqueado"
+                    [mascara] = "componente.mascara">                      
+                  </my-input>
+                  <hr>
+                </div>
+                <div *ngIf="componente.tipo == 'parrafo'&&componente.habilitado == true">
+                  <my-p
+                    [label] = "componente.label"
+                    [descripcion] = "componente.descripcion"
+                    [id] = "componente.id"
+                    [valores]  = "componente.valores" 
+                    [default] = "componente.default"
+                    [habilitado] = "componente.habilitado">                      
+                  </my-p>
+                  <hr>
+                </div>
+                <div *ngIf="componente.tipo == 'toggle'&&componente.habilitado == true">
+                  <my-toggle (evento)="prueba($event)"
+                    [label] = "componente.label"
+                    [descripcion] = "componente.descripcion"
+                    [id] = "componente.id"
+                    [valor] = "componente.default"
+                    [habilitado] = "componente.habilitado"
+                    [requerido] = "componente.requerido"
+                    >                      
+                  </my-toggle>
+                  <hr>
+                </div>
+              </div>
+              <div *ngFor="let tabla of card.tablas">
+                <button ion-button round (click)="agregar_fila(tabla)">{{tabla.boton_agregar}}</button>
+                    <div *ngFor="let fila of tabla.filas; let indice_filas = index">
+                      <ion-card>
+                        <ion-card-header>
+                            <ion-buttons text-start>
+                                <button *ngIf="fila.fija == false"
+                                ion-button round icon-only (click)="eliminar_fila(tabla,indice_filas)">
+                                  <ion-icon name="remove"></ion-icon>
+                                </button>
+                            </ion-buttons>
+                            <h2 text-end><strong>{{indice_filas+1}}</strong></h2>
+                        </ion-card-header>
+                        <ion-card-content>
+                          <ion-grid>
+                            <ion-row>
+                              <ion-col col-sm-12 col-md-6 col-lg-6 *ngFor="let columna of tabla.columnas; let indice_columnas = index">
+                                <ion-list>
+                                <div *ngIf="columna.componente.tipo == 'select'&&columna.componente.habilitado == true">
+                                  <my-select
+                                    [label] = "columna.componente.label"
+                                    [descripcion] = "columna.componente.descripcion"
+                                    [id] = "formar_id(columna.componente.id,fila.index)"
+                                    [valores]  = "columna.componente.valores" 
+                                    [default] = "columna.componente.default"
+                                    [habilitado] = "columna.componente.habilitado"
+                                    [requerido]="columna.componente.requerido"
+                                    [bloqueado]="fila.celdas[indice_columnas].bloqueada"
+                                    [valor]="fila.celdas[indice_columnas].valor">                      
+                                  </my-select>
+                                </div>
+                                <div *ngIf="columna.componente.tipo == 'fecha'&&columna.componente.habilitado == true">
+                                  <my-datetime
+                                    [label] = "columna.componente.label"
+                                    [descripcion] = "columna.componente.descripcion"
+                                    [id] = "formar_id(columna.componente.id,fila.index)"
+                                    [default] = "columna.componente.default"
+                                    [habilitado] = "columna.componente.habilitado"
+                                    [requerido]="columna.componente.requerido"
+                                    [valor]="fila.celdas[indice_columnas].valor">                       
+                                  </my-datetime>
+                                </div>
+                                <div *ngIf="columna.componente.tipo == 'input'&&columna.componente.habilitado == true">
+                                  <my-input
+                                    [label] = "columna.componente.label"
+                                    [descripcion] = "columna.componente.descripcion"
+                                    [id] = "formar_id(columna.componente.id,fila.index)" 
+                                    [default] = "columna.componente.default"
+                                    [habilitado] = "columna.componente.habilitado"
+                                    [requerido]="columna.componente.requerido"
+                                    [placeholder]="columna.componente.placeholder"
+                                    [bloqueado] = "fila.celdas[indice_columnas].bloqueada"
+                                    [mascara] = "columna.componente.mascara"                                    
+                                    [valor]="fila.celdas[indice_columnas].valor">                      
+                                  </my-input>
+                                </div>
+                                <div *ngIf="columna.componente.tipo == 'parrafo'&&columna.componente.habilitado == true">
+                                  <my-p
+                                    [label] = "columna.componente.label"
+                                    [descripcion] = "columna.componente.descripcion"
+                                    [id] = "formar_id(columna.componente.id,fila.index)"
+                                    [valores]  = "columna.componente.valores" 
+                                    [default] = "columna.componente.default"
+                                    [habilitado] = "columna.componente.habilitado">                      
+                                  </my-p>
+                                </div>
+                                <div *ngIf="columna.componente.tipo == 'toggle'&&columna.componente.habilitado == true">
+                                  <my-toggle
+                                    [label] = "columna.componente.label"
+                                    [descripcion] = "columna.componente.descripcion"
+                                    [id] = "formar_id(columna.componente.id,fila.index)"
+                                    [default] = "columna.componente.default"
+                                    [habilitado] = "columna.componente.habilitado"
+                                    [requerido] = "columna.componente.requerido"
+                                    [valor]="fila.celdas[indice_columnas].valor">                      
+                                  </my-toggle>
+                                </div>
+                                </ion-list>
+                              </ion-col>
+                            </ion-row>
+                          </ion-grid>
+                        </ion-card-content>
+                      </ion-card>
+                    </div> 
+              </div>
+          </ion-card-content>
+        </ion-card>     
+      </ion-slide>
+    </ion-slides>
+    
+    </ion-col>
+  </ion-row>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons left>
+      <button ion-button color="secondary" (click)="prev()">Anterior</button>
+    </ion-buttons>  
+    <ion-buttons end>
+      <button ion-button color="secondary" (click)="next()">Siguiente</button>
+    </ion-buttons>      
+  </ion-toolbar>
+</ion-footer>
+

@@ -1,0 +1,82 @@
+
+<ion-header>
+
+    <ion-navbar>
+      <ion-title>Agregar</ion-title>
+      <ion-buttons end>
+        <button ion-button (click)="closeModal()">
+          Cerrar
+        </button>
+      </ion-buttons>
+    </ion-navbar>
+  
+  </ion-header>
+  
+  
+  <ion-content>
+    <ion-card >
+      <ion-card-content>
+          <div *ngFor="let componente of componentes">
+              <!-- Componentes del formulario -->
+              <div *ngIf="componente.tipo == 'select'">
+                <my-select
+                  [label] = "componente.label"
+                  [descripcion] = "componente.descripcion"
+                  [id] = "componente.id"
+                  [valores]  = "componente.valores" 
+                  [default] = "componente.default"
+                  [habilitado] = "componente.habilitado"
+                  [requerido]="componente.requerido">                      
+                </my-select>
+              </div>
+              <div *ngIf="componente.tipo == 'fecha'">
+                <my-datetime
+                  [label] = "componente.label"
+                  [descripcion] = "componente.descripcion"
+                  [id] = "componente.id"
+                  [default] = "componente.default"
+                  [habilitado] = "componente.habilitado"
+                  [requerido]="componente.requerido">                       
+                </my-datetime>
+              </div>
+              <div *ngIf="componente.tipo == 'input'">
+                <my-input
+                  [label] = "componente.label"
+                  [descripcion] = "componente.descripcion"
+                  [id] = "componente.id" 
+                  [default] = "componente.default"
+                  [habilitado] = "componente.habilitado"
+                  [requerido]="componente.requerido"
+                  [placeholder]="componente.placeholder"
+                  [bloqueado] = "componente.bloqueado">                      
+                </my-input>
+              </div>
+              <div *ngIf="componente.tipo == 'parrafo'">
+                <my-p
+                  [label] = "componente.label"
+                  [descripcion] = "componente.descripcion"
+                  [id] = "componente.id"
+                  [valores]  = "componente.valores" 
+                  [default] = "componente.default"
+                  [habilitado] = "componente.habilitado">                      
+                </my-p>
+              </div>
+              <div *ngIf="componente.tipo == 'toggle'">
+                <my-toggle
+                  [label] = "componente.label"
+                  [descripcion] = "componente.descripcion"
+                  [id] = "componente.id"
+                  [default] = "componente.default"
+                  [habilitado] = "componente.habilitado"
+                  [requerido] = "componente.requerido">                      
+                </my-toggle>
+              </div>
+              <hr>
+            </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-row justify-content-center>
+        <button ion-button round (click)="salvarModal()">Guardar</button>
+    </ion-row>
+  </ion-content>
+  

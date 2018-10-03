@@ -1,0 +1,11 @@
+<div *ngIf="habilitado">
+<ion-item>
+  <ion-label color="label-color">{{label}} <span *ngIf="requerido">*</span></ion-label>
+  <ion-toggle 
+    [(ngModel)]="valor"
+    *ngIf="habilitado"
+    (ionChange)="cambio()">
+  </ion-toggle>
+</ion-item>
+<p ion-text color="danger" *ngIf="error">{{error}}</p>
+</div>

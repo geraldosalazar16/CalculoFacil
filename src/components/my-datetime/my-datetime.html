@@ -1,0 +1,12 @@
+<ion-item>
+  <ion-label color="label-color" floating>{{label}} <span *ngIf="requerido">*</span></ion-label>
+  <ion-datetime doneText="Ok" cancelText="Cancelar" displayFormat="MMM DD YYYY" 
+    [(ngModel)]="valor"
+    *ngIf="habilitado"
+    monthNames="Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre"
+    monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sept, Oct, Nov, Dic"
+    dayNames="Domingo, Lunes, Martes, Miércoles, Jueves, Viernes, Sábado"
+    dayShortNames="Dom, Lun, Mar, Miér, Jue, Vie, Sáb">
+  </ion-datetime>
+</ion-item>
+

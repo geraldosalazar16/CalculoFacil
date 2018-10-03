@@ -1,0 +1,16 @@
+<div *ngIf="habilitado">
+<ion-item [class.invalid] = "error">
+    <ion-label color="label-color">{{label}} <span *ngIf="requerido">*</span></ion-label>
+    <ion-input text-right name="entrada"
+    [id]="id"
+    placeholder="{{placeholder}}" 
+    [(ngModel)]="valor"
+    *ngIf="habilitado"
+    [disabled]="bloqueado"
+    >
+    </ion-input>
+</ion-item>
+<p ion-text color="danger" *ngIf="error">{{error}}</p>
+</div>
+
+
