@@ -125,7 +125,8 @@ export class ResultadosPage {
         nuevo_cmp = new Componete_Resultado;
         nuevo_cmp.valor = [];
         nuevo_cmp.tipo = 'normal';
-        nuevo_cmp.valor[0] = dato.valores[0]+' '+dato.valores[1];
+        nuevo_cmp.valor.push(dato.valores[0]);
+        nuevo_cmp.valor.push(dato.valores[1]);
         this.componentes_resultado.push(nuevo_cmp);
         break;
       case 'uno_centrado':

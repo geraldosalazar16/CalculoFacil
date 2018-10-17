@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild} from '@angular/core';
 /**
  * Generated class for the InputComponent component.
  *
@@ -22,7 +22,7 @@ export class InputComponent implements OnInit{
   @Input() valor: string;
   @Input() error: string;
 
-
+  @ViewChild('input') myInput;
   constructor() {
   }
   ngOnInit(){
@@ -30,5 +30,12 @@ export class InputComponent implements OnInit{
   }
   ngAfterViewinit(){
     
+  }
+  focus(valor){
+    if(valor == 'enfocar'){
+      this.myInput.setFocus();
+    } else {
+      //
+    }
   }
 }

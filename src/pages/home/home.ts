@@ -7,7 +7,7 @@
 
 /********* Importando módulos *********/
 import { Component, ViewChildren, QueryList, AfterViewInit, OnInit, ViewChild } from '@angular/core';
-import { NavController, Slides, ModalController,Modal } from 'ionic-angular';
+import { NavController, Slides, ModalController } from 'ionic-angular';
 /********* Importando componentes *********/
 import { InputComponent } from '../../components/input/input';
 import { SelectComponent } from '../../components/select/select';
@@ -133,6 +133,7 @@ export class HomePage implements AfterViewInit, OnInit{
   cambio_estructura() {
     this.estructura_actual = this.calculos;
     this.cargar_estructura();
+    this.goToSlide(1);
   }
   /*
   @quiero Cargar la estructura seleccionada como actual en el DOM  
@@ -384,7 +385,7 @@ export class HomePage implements AfterViewInit, OnInit{
         var mensajes = data.messages;
         //Si hay mensajes se muestran como una notificación
         mensajes.forEach(mensaje => {
-          this.mostrar_mensaje(mensaje.tipo,mensaje.messasge);
+          this.mostrar_mensaje(mensaje.tipo,mensaje.message);
         });
         /*
         @quiero Recorrer el arreglo de errores recibidos   
@@ -628,6 +629,10 @@ export class HomePage implements AfterViewInit, OnInit{
         el.error = error;
         el.valor = valor;
         if(error !== ""){
+          //Solo enfoco para el primer error
+          if(this.errores_encontrados == 0){
+            el.focus('enfocar');
+          }
           this.errores_encontrados++;
         }
         return true;
@@ -638,6 +643,10 @@ export class HomePage implements AfterViewInit, OnInit{
             el.error = error;
             el.valor = valor;
             if(error !== ""){
+              //Solo enfoco para el primer error
+              if(this.errores_encontrados == 0){
+                el.focus('enfocar');
+              }
               this.errores_encontrados++;
             }
             return true;
@@ -655,6 +664,8 @@ export class HomePage implements AfterViewInit, OnInit{
   @param ---- 
   */
   mostrar_mensaje(type,text){
+    //Limpiar el texto poruqe llega con html
+    text = this.limpiar_texto(text);
     switch (type) {
       case 'error':
         this.pnotify.error({
@@ -759,10 +770,15 @@ export class HomePage implements AfterViewInit, OnInit{
       '&iacute;':'í',
       '&oacute;':'ó',
       '&uacute;':'ú',
+      '&acute;':'á',
+      '&ecute;':'é',
+      '&icute;':'í',
+      '&ocute;':'ó',
+      '&ucute;':'ú',
       '&ntilde;':'ñ',
     };
     if(text){
-      return text.replace(/&aacute;|&eacute;|&iacute;|&oacute;|&uacute;|&ntilde;/g, function(m) { return map[m]; });
+      return text.replace(/&aacute;|&eacute;|&iacute;|&oacute;|&uacute;|&acute;|&ecute;|&icute;|&ocute;|&ucute;|&ntilde;/g, function(m) { return map[m]; });
     }
     return null;
   }
