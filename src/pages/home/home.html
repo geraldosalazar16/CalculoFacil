@@ -3,9 +3,11 @@
     <ion-row>
       <ion-col col-md-3>
         <ion-item>
-            <ion-label color="primary" floating>Cálculos </ion-label>
+            <ion-label color="primary" floating>Tipo de Cálculo</ion-label>
             <ion-select interface="action-sheet"
-            [(ngModel)]="calculos" (ionChange)="cambio_estructura()">
+            [(ngModel)]="calculos" 
+            (ionChange)="cambio_estructura()"
+            [disabled] = "deshabilitar_select_calculos">
               <ion-option 
               *ngFor="let est of estructuras" 
               [value] = "est"
@@ -33,7 +35,8 @@
 </ion-header>
 
 
-<ion-content>  
+<ion-content> 
+  <!--<div><p *ngIf="inputs">{{inputs.length}}</p></div> -->
   <ion-row justify-content-center>
     <ion-col col-12 col-sm-12 col-md-6>
     <ion-slides 

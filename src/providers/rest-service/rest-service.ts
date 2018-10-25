@@ -12,13 +12,13 @@ import { Injectable } from '@angular/core';
 export class RestServiceProvider {
 
   constructor(public http: HttpClient) {
-    console.log('Hello RestServiceProvider Provider');
+    //console.log('Hello RestServiceProvider Provider');
   }
   getEstructura(url) {
     return this.http.get(url);
   }
   getEstructuras(){
-    return this.http.get<Estructura[]>('http://minotaria.net/base/angular/calculofacil/api_racoo/estructuras.php');
+    return this.http.get<Estructura[]>('http://minotaria.net/base/angular/calculofacil/api_racoo/estructuras.php').toPromise();
   }
   getUrl(url,params){
     //return this.http.get(url,{params: {geraldo: '1'}});
@@ -33,9 +33,22 @@ export class RestServiceProvider {
   postData(url: string,data: any){
     return this.http.post(url,JSON.stringify(data));
   }
+  getCalculos(){
+    return this.http.get('http://minotaria.net/base/angular/calculofacil/api_racoo/calculos_guardados/leer_calculos.php');
+  }
 }
 export interface Estructura {
   estructura: string;
+  tipo: number;
   url: string;
   inicial: boolean;
+}
+export interface Calculo {
+  nombre: string;
+  data: ObjCalculo[];
+}
+export interface ObjCalculo {
+  id: string;
+  valor: any;
+  error: string;
 }

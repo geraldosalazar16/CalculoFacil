@@ -6,8 +6,8 @@
 */
 
 /********* Importando módulos *********/
-import { Component, ViewChildren, QueryList, AfterViewInit, OnInit, ViewChild } from '@angular/core';
-import { NavController, Slides, ModalController } from 'ionic-angular';
+import { Component, ViewChildren, QueryList, AfterViewInit, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { NavController, NavParams, Slides } from 'ionic-angular';
 /********* Importando componentes *********/
 import { InputComponent } from '../../components/input/input';
 import { SelectComponent } from '../../components/select/select';
@@ -71,7 +71,15 @@ export class HomePage implements AfterViewInit, OnInit{
   cmp_respuestas: CmpRespuesta[] = [];
 
   pnotify: any;
+  //Listado de tipos de cálculo
   calculos;
+  //habilita / Deshabilita el listado de cálculos
+  deshabilitar_select_calculos: boolean = false;
+  //Almacena el cálculo actual
+  calculo_actual;
+  //Determina si estamos creando o editando un cálculo
+  accion: string;
+  orden = 0;
   /*
   @quiero Crear estructura inicial que se va a cargar
   @para ---- Evitar que la aplicación empiece en blanco
@@ -80,6 +88,7 @@ export class HomePage implements AfterViewInit, OnInit{
   */
   estructura_actual: Estructura = {
     estructura: 'ISR x Enajenación',
+    tipo: 1,
     url: 'http://minotaria.net/base/angular/calculofacil/api_racoo/isr_enajenacion.php',
     inicial: true
   };
@@ -93,24 +102,47 @@ export class HomePage implements AfterViewInit, OnInit{
   constructor(
     public navCtrl: NavController,
     private restProvider: RestServiceProvider,
-    private modal: ModalController,
-    pnotify: PnotifyProvider
+    public navParams: NavParams,
+    pnotify: PnotifyProvider,
+    private cdr: ChangeDetectorRef
   ) {
+    this.calculo_actual = navParams.get('data');
+    
     this.inicial = false;
     this.estructuras = [];
     //Consume el rest provider para leer las posibles estructuras
-    this.restProvider.getEstructuras()
-    .subscribe(estructuras => {
-      estructuras.forEach(data => {
-        this.estructuras.push(data);
+    //const estructuras = await this.restProvider.getEstructuras()
+    
+    this.pnotify = pnotify.getPNotify();
+    
+    this.getEstructuras();
+  }
+  async getEstructuras(){
+    this.orden = 0;
+    const estructuras = await this.restProvider.getEstructuras();
+
+    estructuras.forEach(data => {
+      this.estructuras.push(data);
+      //Cuando es creación de cálculo se carga la inicial por defecto
+      if(this.calculo_actual == ''){
+        this.accion = 'insertar';
         //La estructura que tenga el atributo inicial = true es la que se suará pro defecto
         if (data.inicial) {
           this.estructura_actual = data;
+          this.calculos = data;
+          this.deshabilitar_select_calculos = false;
         }
-      });
+      } else {
+        this.accion = 'editar';
+        //De lo contrario es edición por lo que se carga el tipo de cálculo y se bloquea el select
+        if(data.tipo == this.calculo_actual.tipo){
+          //Selecciono la estructura segun el tipo de cálculo
+          this.estructura_actual = data;
+          this.calculos = data;
+          this.deshabilitar_select_calculos = true;
+        }
+      }
     });
-    this.pnotify = pnotify.getPNotify();
-    
   }
   /*
   @quiero Función que se activa cuando se termina de cargar la vista  
@@ -119,10 +151,81 @@ export class HomePage implements AfterViewInit, OnInit{
   @param ---- 
   */
   ionViewDidLoad () {
+    console.log('ionViewDidLoad Posicion: ',this.orden);
+    console.log('Inputs length: ',this.inputs.length)
+    this.orden++;
+
     this.restProvider.getEstructura(this.estructura_actual.url)
     .subscribe((data: any) =>{
-      this.usar_estructura(data);
+      if(this.accion == 'insertar'){
+        this.usar_estructura(data);
+      } else {
+        var data_modificado = this.cargarCalculoActual(data,this.calculo_actual.data);
+        this.usar_estructura(data_modificado);
+      }   
     });
+  }
+  ionViewWillEnter() {
+    /*...*/
+    console.log('ionViewWillEnter Posicion: ',this.orden);
+    console.log('Inputs length: ',this.inputs.length)
+    this.orden++;
+  }
+  ionViewDidLeave() {
+    console.log('ionViewDidLeave Posicion: ',this.orden);
+    console.log('Inputs length: ',this.inputs.length)
+    this.orden++;
+    /*...*/}
+  //Fired when entering a page, after it becomes the active page.
+  ionViewDidEnter(){
+    console.log('ionViewDidEnter Posicion: ',this.orden);
+    console.log('Inputs length: ',this.inputs.length)
+    this.orden++;
+    /*
+    if(this.accion == 'editar'){
+      this.cargarCalculoActual();
+    }
+    */
+  }
+  cargarCalculoActual(data_estructura,calculo_cargar){
+    var r;
+    //data es la estructura original
+    data_estructura.cards.forEach(card => {
+      if(card.componentes){
+        card.componentes.forEach(componente => {    
+          var res = calculo_cargar.some(componente_cargar => {
+            if(componente_cargar.id == componente.id) {
+              componente.default = componente_cargar.valor;
+              return true;
+            }
+            return false;
+          });
+          r = res;
+        });
+      } 
+      //Luego de los componentes del card hay que explorar las tablas     
+      if(card.tablas && r){
+        card.tablas.forEach(tabla => {
+          //Mapeo de las filas de la tabla
+          tabla.filas.forEach((fila,index) => {
+            //Mapeo de las celdas de la tabla
+            fila.celdas.forEach(celda => {
+              var id = celda.id_columna+fila.index;
+              
+              calculo_cargar.some(componente_cargar => {
+                var id_cargar = componente_cargar.id + componente_cargar.fila;
+                if(id_cargar == id) {
+                  celda.valor = componente_cargar.valor;
+                  return true;
+                }
+                return false;
+              });
+            });
+          });
+        });
+      } 
+    });
+    return data_estructura;
   }
   /*
   @quiero Escuchar cuando se cambia de structura 
@@ -131,9 +234,15 @@ export class HomePage implements AfterViewInit, OnInit{
   @param ---- 
   */
   cambio_estructura() {
-    this.estructura_actual = this.calculos;
-    this.cargar_estructura();
-    this.goToSlide(1);
+    //Solo se puede cambiar cuando es inserción
+    if(this.accion == 'insertar'){
+      this.estructura_actual = this.calculos;
+      this.cargar_estructura();
+      this.goToSlide(0);
+    } else {
+      //this.cargar_calculo();
+      this.goToSlide(0);
+    }
   }
   /*
   @quiero Cargar la estructura seleccionada como actual en el DOM  
@@ -146,7 +255,15 @@ export class HomePage implements AfterViewInit, OnInit{
     var component = this.navCtrl.getActive().instance;
     //re-run the view load function if the page has one declared
     if (component.ionViewDidLoad) {
-    component.ionViewDidLoad();
+      component.ionViewDidLoad();
+    }
+  }
+  cargar_calculo() {
+    //get the currently active page component
+    var component = this.navCtrl.getActive().instance;
+    //re-run the view load function if the page has one declared
+    if (component.ionViewDidEnter) {
+      component.ionViewDidEnter();
     }
   }
   /*
@@ -227,6 +344,7 @@ export class HomePage implements AfterViewInit, OnInit{
               });
               t.filas.push(f);
             });
+            
             //Mapeo de las columnas de la tabla
             t.columnas = [];
             tabla.columnas.forEach(columna => {
@@ -245,6 +363,54 @@ export class HomePage implements AfterViewInit, OnInit{
         }  
         this.cards_recibidos.push(carta);
       });
+      if(this.accion == 'editar'){
+        this.cards_recibidos.forEach(card => {
+          card.tablas.forEach(tabla => {
+            tabla.columnas.forEach(columna => {
+              this.calculo_actual.data.forEach(cmp_calculo => {
+                if(cmp_calculo.id == columna.id){
+                  var fila_encontrada = false;
+                  tabla.filas.forEach(fila => {
+                    if(fila.index == cmp_calculo.fila){
+                      fila_encontrada = true;
+                      var celda_encontrada = false;
+                      fila.celdas.forEach(celda => {
+                        if(celda.id_columna == cmp_calculo.id){
+                          celda.valor = cmp_calculo.valor;
+                          celda_encontrada = true;
+                        }
+                      });
+                      if(!celda_encontrada){
+                        var c = new Celda();
+                        c.id_columna = columna.id;
+                        c.valor = cmp_calculo.valor;
+                        c.bloqueada = false;
+                        c.fila = cmp_calculo.fila;
+                        fila.celdas.push(c);
+                      }
+                    }
+                  });
+                  if(!fila_encontrada){
+                    var f = new Fila();
+                    f.index = cmp_calculo.fila;
+                    f.fija = false;
+                    f.celdas = [];
+                    var c = new Celda();
+                    c.id_columna = columna.id;
+                    c.valor = cmp_calculo.valor;
+                    c.bloqueada = false;
+                    c.fila = cmp_calculo.fila;
+                    f.celdas.push(c);
+                    tabla.filas.push(f);
+                  }
+                }
+              });
+            });
+          });
+        });
+        console.log(this.cards_recibidos);
+      }
+      
   }
   /*
   @quiero Función para mapear el componente recibido a la interfaz de componente creada  
@@ -298,10 +464,19 @@ export class HomePage implements AfterViewInit, OnInit{
   }
   //Función que se ejecuta luego de inicializada la vista
   ngAfterViewInit() {
-
+    this.cdr.detectChanges();
+    console.log('ngAfterViewInit Posicion: ',this.orden);
+    console.log('Inputs length: ',this.inputs.length)
+    this.orden++;
   }
   //Función que se ejecuta cuando inicializa la app
   ngOnInit(){
+    this.cdr.detectChanges();
+    console.log('ngOnInit Posicion: ',this.orden);
+    console.log('Inputs length: ',this.inputs.length)
+    this.orden++;
+  }
+  ngAfterViewChecked(){
     
   }
   /*
@@ -311,7 +486,11 @@ export class HomePage implements AfterViewInit, OnInit{
   @param ---- 
   */
   next() {
+    let currentIndex = this.slides.getActiveIndex();
+    console.log('Current index is', currentIndex);
     this.slides.slideNext(10);
+    currentIndex = this.slides.getActiveIndex();
+    console.log('Current index is', currentIndex);
   }
   /*
   @quiero Función que escucha al botón Anterior   
@@ -320,7 +499,11 @@ export class HomePage implements AfterViewInit, OnInit{
   @param ---- 
   */
   prev() {
+    let currentIndex = this.slides.getActiveIndex();
+    console.log('Current index is', currentIndex);
     this.slides.slidePrev();
+    currentIndex = this.slides.getActiveIndex();
+    console.log('Current index is', currentIndex);
   }
   /*
   @quiero Función para ir a un slide específico   
@@ -377,8 +560,42 @@ export class HomePage implements AfterViewInit, OnInit{
     if(boton.accion == "enviar_datos"){
       //Leer todos los valores de los elementos del DOM
       this.leer_forma();
+      //Ordenar los componentes
+      var componentes_ordenados: Array<CmpRespuesta> = [];
+      this.cards_recibidos.forEach(card => {
+        //Primero recorro todos los cards recibidos
+        card.componentes.forEach(cmp_card => {
+          
+          this.cmp_respuestas.some(cmp_respuesta => {
+            if(cmp_respuesta.id == cmp_card.id){
+              componentes_ordenados.push(cmp_respuesta);
+              return true;
+            }
+            return false;
+          });
+
+        });
+        //Luego las tablas
+        if(card.tablas){
+          card.tablas.forEach(tabla_card => {
+            tabla_card.filas.forEach(fila => {
+              fila.celdas.forEach(celda => {
+                this.cmp_respuestas.some(cmp_respuesta => {
+                  const id_cmp_respuesta = cmp_respuesta.id + cmp_respuesta.fila;
+                  const id_celda = celda.id_columna + celda.fila;
+                  if(id_cmp_respuesta == id_celda){
+                    componentes_ordenados.push(cmp_respuesta);
+                    return true;
+                  }
+                  return false;
+                });
+              });
+            });
+          });
+        }        
+      });
       //Enviar a la URL asociada al botón los valores leídos
-     this.restProvider.getUrl(boton.url,this.cmp_respuestas)
+     this.restProvider.getUrl(boton.url,componentes_ordenados)
      .subscribe((data: any) =>{      
         //Buscar errores
         var errores = data.data;
@@ -427,7 +644,7 @@ export class HomePage implements AfterViewInit, OnInit{
   */
   agregar_fila(tabla){
       const columnas = tabla.columnas;
-      const indice = tabla.filas.length+1;
+      const indice = tabla.filas.length;
       const fila = new Fila();
       fila.celdas = [];
       fila.index = indice;
@@ -462,6 +679,7 @@ export class HomePage implements AfterViewInit, OnInit{
   leer_forma(){
     this.cmp_respuestas = [];
     //Ahora a leer los valores
+    console.log('Recorriendo inputs, Inputs length: ',this.inputs.length);
     this.inputs.forEach(input => {
       var id = input.id;
       var valor = input.valor;

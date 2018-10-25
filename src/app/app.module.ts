@@ -6,6 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
+import { CalculosPage } from '../pages/calculos/calculos';
 import { ResultadosPageModule } from '../pages/resultados/resultados.module';
 
 import { ComponentsModule } from '../components/components.module';
@@ -19,7 +20,8 @@ import { PnotifyProvider } from '../providers/pnotify/pnotify';
 @NgModule({
   declarations: [
     MyApp,
-    HomePage
+    HomePage,
+    CalculosPage
   ],
   imports: [
     BrowserModule,
@@ -32,7 +34,8 @@ import { PnotifyProvider } from '../providers/pnotify/pnotify';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    HomePage,
+    CalculosPage
   ],
   providers: [
     StatusBar,

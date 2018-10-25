@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams } from 'ionic-angular';
+
+import { RestServiceProvider,ObjCalculo,Calculo } from '../../providers/rest-service/rest-service';
+import { HomePage } from '../home/home';
 
 /**
  * Generated class for the CalculosPage page.
@@ -8,18 +11,31 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
  * Ionic pages and navigation.
  */
 
-@IonicPage()
 @Component({
   selector: 'page-calculos',
   templateUrl: 'calculos.html',
 })
 export class CalculosPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  calculos;
+
+  constructor(public navCtrl: NavController, 
+    public navParams: NavParams,
+    private restProvider: RestServiceProvider) {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad CalculosPage');
+    this.restProvider.getCalculos().
+    subscribe(calculos => {
+      this.calculos = calculos;
+    });
   }
-
+  //Crear un nuevo cálculo
+  crear_calculo(){
+    this.navCtrl.push(HomePage,{data:''});
+  }
+  //Abre un cálculo
+  abrir_calculo(calculo){
+    this.navCtrl.push(HomePage,{data:calculo});
+  }
 }
